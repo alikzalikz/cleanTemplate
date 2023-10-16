@@ -3,7 +3,6 @@ using CharchoobApi.Infrastructure.Identity;
 using CharchoobApi.Infrastructure.Persistence;
 using CharchoobApi.Infrastructure.Persistence.Interceptors;
 using CharchoobApi.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,21 +30,12 @@ public static class ConfigureServices
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services
-            .AddDefaultIdentity<ApplicationUser>()
+            .AddIdentityCore<ApplicationUser>()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-        services.AddIdentityServer()
-            .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
-
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();
-
-        services.AddAuthentication()
-            .AddIdentityServerJwt();
-
-        services.AddAuthorization(options =>
-            options.AddPolicy("CanPurge", policy => policy.RequireRole("Administrator")));
 
         return services;
     }

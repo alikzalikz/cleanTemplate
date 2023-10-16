@@ -6,7 +6,7 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
     public RegisterCommandValidator()
     {
-        RuleFor(req => req.UserName)
+        RuleFor(req => req.Username)
             .NotEmpty();
 
         RuleFor(req => req.Password)

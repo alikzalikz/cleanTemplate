@@ -7,7 +7,7 @@ namespace CharchoobApi.Application.Auth.Commands.Register;
 
 public record RegisterCommand : IRequest<Result>
 {
-    public required string UserName { get; set; }
+    public required string Username { get; set; }
     public required string Email { get; set; }
     public required string Password { get; set; }
 }
@@ -24,7 +24,7 @@ public class RegisterHandler : IRequestHandler<RegisterCommand, Result>
     public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         var isCreate = await _identityService
-            .CreateUserAsync(request.UserName, request.Email, request.Password);
+            .CreateUserAsync(request.Username, request.Email, request.Password);
 
         if (isCreate)
         {
