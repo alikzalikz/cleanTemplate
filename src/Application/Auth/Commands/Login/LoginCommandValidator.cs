@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace CharchoobApi.Application.Auth.Queries.Login;
+namespace CharchoobApi.Application.Auth.Commands.Login;
 
-public class LoginQueryValidator : AbstractValidator<LoginQuery>
+public class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
-    public LoginQueryValidator()
+    public LoginCommandValidator()
     {
         RuleFor(req => req.Username)
             .NotEmpty();

@@ -1,4 +1,6 @@
 ﻿using CharchoobApi.Application.WeatherForecasts.Queries.GetWeatherForecasts;
+using CharchoobApi.Domain.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CharchoobApi.Host.Controllers.V1;
@@ -7,6 +9,7 @@ namespace CharchoobApi.Host.Controllers.V1;
 /// Weather Forecast
 /// </summary>
 [ApiVersion("1.0")]
+[Authorize(Roles = Sd.User)]
 public class WeatherForecastController : ApiControllerBase
 {
     /// <summary>

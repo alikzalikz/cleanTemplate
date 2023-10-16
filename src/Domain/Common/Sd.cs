@@ -5,7 +5,7 @@ public class Sd
     #region role
 
     public const string Admin = "admin";
-    public const string User = "User";
+    public const string User = "user";
 
     #endregion
 

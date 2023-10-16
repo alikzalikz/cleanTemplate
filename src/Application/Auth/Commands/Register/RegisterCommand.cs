@@ -7,9 +7,9 @@ namespace CharchoobApi.Application.Auth.Commands.Register;
 
 public record RegisterCommand : IRequest<Result>
 {
-    public required string Username { get; set; }
-    public required string Email { get; set; }
-    public required string Password { get; set; }
+    public required string Username { get; init; }
+    public required string Email { get; init; }
+    public required string Password { get; init; }
 }
 
 public class RegisterHandler : IRequestHandler<RegisterCommand, Result>

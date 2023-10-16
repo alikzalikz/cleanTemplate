@@ -101,4 +101,34 @@ public class IdentityService : IIdentityService
             RefreshToken = refreshToken.Token,
         };
     }
+
+    public async Task<Tokens?> RefreshTokenAsync(string expireAccessToken, TblRefreshToken refreshToken)
+    {
+        _dbContext.TblRefreshToken.Remove(refreshToken);
+        await _dbContext.SaveChangesAsync(CancellationToken.None);
+
+        var user = await _userManager.FindByIdAsync(DecodeUserId(expireAccessToken));
+        if (user is not null)
+        {
+            var newTokens = await GenerateTokensAsync(user);
+
+            return newTokens;
+        }
+
+        return null;
+    }
+
+    public string? DecodeJti(string accessToken)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var decode = handler.ReadJwtToken(accessToken);
+        return decode?.Claims.First(c => c.Type == "jti").Value;
+    }
+
+    private string DecodeUserId(string accessToken)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var decode = handler.ReadJwtToken(accessToken);
+        return decode.Claims.First(c => c.Type == "Id").Value;
+    }
 }
