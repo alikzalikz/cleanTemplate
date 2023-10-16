@@ -1,5 +1,4 @@
 ﻿using CharchoobApi.Application.Common.Interfaces;
-using CharchoobApi.Infrastructure.Files;
 using CharchoobApi.Infrastructure.Identity;
 using CharchoobApi.Infrastructure.Persistence;
 using CharchoobApi.Infrastructure.Persistence.Interceptors;
@@ -31,8 +30,6 @@ public static class ConfigureServices
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
-        services.AddScoped<ApplicationDbContextInitialiser>();
-
         services
             .AddDefaultIdentity<ApplicationUser>()
             .AddRoles<IdentityRole>()
@@ -43,7 +40,6 @@ public static class ConfigureServices
 
         services.AddTransient<IDateTime, DateTimeService>();
         services.AddTransient<IIdentityService, IdentityService>();
-        services.AddTransient<ICsvFileBuilder, CsvFileBuilder>();
 
         services.AddAuthentication()
             .AddIdentityServerJwt();

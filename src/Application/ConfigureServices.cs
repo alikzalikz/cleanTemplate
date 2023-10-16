@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using CharchoobApi.Application.Common.Behaviours;
-using CharchoobApi.Application.Common.Exceptions;
+using CharchoobApi.Application.Common.Models;
 using FluentValidation;
-using MediatR;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -12,13 +12,13 @@ public static class ConfigureServices
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddSwaggerExamplesFromAssemblies(Assembly.GetExecutingAssembly());
+        services.AddFluentValidationAutoValidation(option =>
+        {
+            option.OverrideDefaultResultFactoryWith<ValidationResult>();
+        });
         services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehaviour<,>));
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
-
         });
 
         return services;
