@@ -1,0 +1,8 @@
+﻿using CharchoobApi.Application.Common.Interfaces;
+
+namespace CharchoobApi.Infrastructure.Services;
+
+public class DateTimeService : IDateTime
+{
+    public DateTime Now => DateTime.Now;
+}
