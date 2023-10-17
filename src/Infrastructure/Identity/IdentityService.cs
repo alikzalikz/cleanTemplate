@@ -1,134 +1,134 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using CharchoobApi.Application.Common.Interfaces;
-using CharchoobApi.Application.Common.Models;
-using CharchoobApi.Domain.Common;
-using CharchoobApi.Domain.Entities.gnr;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
+﻿//using System.IdentityModel.Tokens.Jwt;
+//using System.Security.Claims;
+//using System.Security.Cryptography;
+//using System.Text;
+//using CharchoobApi.Application.Common.Interfaces;
+//using CharchoobApi.Application.Common.Models;
+//using CharchoobApi.Domain.Common;
+//using CharchoobApi.Domain.Entities.gnr;
+//using Microsoft.AspNetCore.Identity;
+//using Microsoft.Extensions.Configuration;
+//using Microsoft.IdentityModel.Tokens;
 
-namespace CharchoobApi.Infrastructure.Identity;
+//namespace CharchoobApi.Infrastructure.Identity;
 
-public class IdentityService : IIdentityService
-{
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IApplicationDbContext _dbContext;
-    private readonly IConfiguration _configuration;
+//public class IdentityService : IIdentityService
+//{
+//    private readonly UserManager<ApplicationUser> _userManager;
+//    private readonly RoleManager<IdentityRole> _roleManager;
+//    private readonly IApplicationDbContext _dbContext;
+//    private readonly IConfiguration _configuration;
 
-    public IdentityService(
-        UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager,
-        IApplicationDbContext dbContext,
-        IConfiguration configuration
-        )
-    {
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _dbContext = dbContext;
-        _configuration = configuration;
-    }
+//    public IdentityService(
+//        UserManager<ApplicationUser> userManager,
+//        RoleManager<IdentityRole> roleManager,
+//        IApplicationDbContext dbContext,
+//        IConfiguration configuration
+//        )
+//    {
+//        _userManager = userManager;
+//        _roleManager = roleManager;
+//        _dbContext = dbContext;
+//        _configuration = configuration;
+//    }
 
-    public async Task<bool> CreateUserAsync(string username, string email, string password)
-    {
-        var user = new ApplicationUser
-        {
-            UserName = username,
-            Email = email,
-        };
+//    public async Task<bool> CreateUserAsync(string username, string email, string password)
+//    {
+//        var user = new ApplicationUser
+//        {
+//            UserName = username,
+//            Email = email,
+//        };
 
-        var result = await _userManager.CreateAsync(user, password);
+//        var result = await _userManager.CreateAsync(user, password);
 
-        if (result.Succeeded)
-        {
-            if (!_roleManager.RoleExistsAsync(Sd.Admin).GetAwaiter().GetResult())
-            {
-                // create role in database
-                await _roleManager.CreateAsync(new IdentityRole(Sd.User));
-                await _roleManager.CreateAsync(new IdentityRole(Sd.Admin));
-            }
+//        if (result.Succeeded)
+//        {
+//            if (!_roleManager.RoleExistsAsync(Sd.Admin).GetAwaiter().GetResult())
+//            {
+//                // create role in database
+//                await _roleManager.CreateAsync(new IdentityRole(Sd.User));
+//                await _roleManager.CreateAsync(new IdentityRole(Sd.Admin));
+//            }
 
-            await _userManager.AddToRoleAsync(user, Sd.User);
-            return true;
-        }
+//            await _userManager.AddToRoleAsync(user, Sd.User);
+//            return true;
+//        }
 
-        return false;
-    }
+//        return false;
+//    }
 
-    public async Task<Tokens> GenerateTokensAsync(ApplicationUser user)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
+//    public async Task<Tokens> GenerateTokensAsync(ApplicationUser user)
+//    {
+//        var jwtTokenHandler = new JwtSecurityTokenHandler();
 
-        var key = Encoding.UTF8.GetBytes(_configuration.GetSection("AuthOptions:SecureKey").Value!);
+//        var key = Encoding.UTF8.GetBytes(_configuration.GetSection("AuthOptions:SecureKey").Value!);
 
-        int accessLifetime = int.Parse(_configuration.GetSection("AuthOptions:AccessTokenLife").Value!);
-        int refreshTokenLifetime = int.Parse(_configuration.GetSection("AuthOptions:RefreshTokenLife").Value!);
+//        int accessLifetime = int.Parse(_configuration.GetSection("AuthOptions:AccessTokenLife").Value!);
+//        int refreshTokenLifetime = int.Parse(_configuration.GetSection("AuthOptions:RefreshTokenLife").Value!);
 
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.Role, Sd.User),
-                new Claim("Id", user.Id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            }),
+//        var tokenDescriptor = new SecurityTokenDescriptor
+//        {
+//            Subject = new ClaimsIdentity(new[]
+//            {
+//                new Claim(ClaimTypes.Role, Sd.User),
+//                new Claim("Id", user.Id),
+//                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+//            }),
 
-            Expires = DateTime.UtcNow.AddMinutes(accessLifetime),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
+//            Expires = DateTime.UtcNow.AddMinutes(accessLifetime),
+//            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+//        };
 
-        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-        var accessToken = jwtTokenHandler.WriteToken(token);
+//        var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+//        var accessToken = jwtTokenHandler.WriteToken(token);
 
-        var refreshToken = new TblRefreshToken()
-        {
-            JwtId = token.Id,
-            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-            UserId = user.Id,
-            CreateDate = DateTime.UtcNow,
-            ExpiryDate = DateTime.UtcNow.AddMonths(refreshTokenLifetime)
-        };
+//        var refreshToken = new TblRefreshToken()
+//        {
+//            JwtId = token.Id,
+//            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+//            UserId = user.Id,
+//            CreateDate = DateTime.UtcNow,
+//            ExpiryDate = DateTime.UtcNow.AddMonths(refreshTokenLifetime)
+//        };
 
-        await _dbContext.TblRefreshToken.AddAsync(refreshToken);
-        await _dbContext.SaveChangesAsync(CancellationToken.None);
+//        await _dbContext.TblRefreshToken.AddAsync(refreshToken);
+//        await _dbContext.SaveChangesAsync(CancellationToken.None);
 
-        return new Tokens()
-        {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken.Token,
-        };
-    }
+//        return new Tokens()
+//        {
+//            AccessToken = accessToken,
+//            RefreshToken = refreshToken.Token,
+//        };
+//    }
 
-    public async Task<Tokens?> RefreshTokenAsync(string expireAccessToken, TblRefreshToken refreshToken)
-    {
-        _dbContext.TblRefreshToken.Remove(refreshToken);
-        await _dbContext.SaveChangesAsync(CancellationToken.None);
+//    public async Task<Tokens?> RefreshTokenAsync(string expireAccessToken, TblRefreshToken refreshToken)
+//    {
+//        _dbContext.TblRefreshToken.Remove(refreshToken);
+//        await _dbContext.SaveChangesAsync(CancellationToken.None);
 
-        var user = await _userManager.FindByIdAsync(DecodeUserId(expireAccessToken));
-        if (user is not null)
-        {
-            var newTokens = await GenerateTokensAsync(user);
+//        var user = await _userManager.FindByIdAsync(DecodeUserId(expireAccessToken));
+//        if (user is not null)
+//        {
+//            var newTokens = await GenerateTokensAsync(user);
 
-            return newTokens;
-        }
+//            return newTokens;
+//        }
 
-        return null;
-    }
+//        return null;
+//    }
 
-    public string? DecodeJti(string accessToken)
-    {
-        var handler = new JwtSecurityTokenHandler();
-        var decode = handler.ReadJwtToken(accessToken);
-        return decode?.Claims.First(c => c.Type == "jti").Value;
-    }
+//    public string? DecodeJti(string accessToken)
+//    {
+//        var handler = new JwtSecurityTokenHandler();
+//        var decode = handler.ReadJwtToken(accessToken);
+//        return decode?.Claims.First(c => c.Type == "jti").Value;
+//    }
 
-    private string DecodeUserId(string accessToken)
-    {
-        var handler = new JwtSecurityTokenHandler();
-        var decode = handler.ReadJwtToken(accessToken);
-        return decode.Claims.First(c => c.Type == "Id").Value;
-    }
-}
+//    private string DecodeUserId(string accessToken)
+//    {
+//        var handler = new JwtSecurityTokenHandler();
+//        var decode = handler.ReadJwtToken(accessToken);
+//        return decode.Claims.First(c => c.Type == "Id").Value;
+//    }
+//}
